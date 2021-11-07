@@ -2,11 +2,11 @@ import { listenAndServe } from "https://deno.land/std@0.113.0/http/server.ts";
 import { serveFile } from "https://deno.land/std@0.113.0/http/file_server.ts";
 import {
   common,
-  parse,
+  // parse,
   extname,
   toFileUrl,
 } from "https://deno.land/std@0.113.0/path/mod.ts";
-import { ensureDir } from "https://deno.land/std@0.113.0/fs/mod.ts";
+//import { ensureDir } from "https://deno.land/std@0.113.0/fs/mod.ts";
 import { MEDIA_TYPES } from "./media-type.js";
 
 const staticAssets = {
@@ -18,7 +18,7 @@ const staticAssets = {
 
 /**
  * @param {string} path 
- * @returns string
+ * @returns {string}
  */
 function removeLeadingSlash(path) {
   if (path.startsWith("/")) {
@@ -29,7 +29,7 @@ function removeLeadingSlash(path) {
 
 /**
  * @param {string} path 
- * @returns 
+ * @returns {string}
  */
 function removeTrailingSlash(path) {
   if (path.endsWith("/")) {
@@ -40,7 +40,7 @@ function removeTrailingSlash(path) {
 
 /**
  * @param {string} path 
- * @returns 
+ * @returns {string}
  */
 function removeSlashes(path) {
   return removeTrailingSlash(removeLeadingSlash(path));
@@ -48,6 +48,7 @@ function removeSlashes(path) {
 
 /**
 * @param {Request} request
+* @returns {Promise<Response>}
 */
 async function requestHandler(request) {
   const mode = request.headers.get('sec-fetch-mode');
@@ -142,11 +143,11 @@ async function requestHandler(request) {
         const shortFileName = fileName.replace(commonPath, ``);
 
         sessionStorage.setItem(shortFileName, text);
-        const outputFileName = `./dist/${shortFileName}`;
+        // const outputFileName = `./dist/${shortFileName}`;
 
-        const { dir } = parse(outputFileName);
-        await ensureDir(dir);
-        await Deno.writeTextFile(outputFileName, text);
+        // const { dir } = parse(outputFileName);
+        // await ensureDir(dir);
+        // await Deno.writeTextFile(outputFileName, text);
       }
 
       return new Response(pathname, {
