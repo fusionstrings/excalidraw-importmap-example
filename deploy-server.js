@@ -36,22 +36,32 @@ function removeSlashes(path) {
     return removeTrailingSlash(removeLeadingSlash(path));
 }
 
+/**
+ * A `maidenPathname` is a `URL.pathname` without any path prefix, relative or absolute.
+ * e.g. 👇
+ * ```
+ * https://www.example.com/js/main.js -> js/main.js
+ * /js/main.js -> js/main.js
+ * ./js/main.js -> js/main.js
+ * js/main.js -> js/main.js
+ * ```
+ * @param {string} maidenPathname 
+ * @returns {string}
+ */
 function getFileExtensionFromPath(maidenPathname) {
     const [fileExtension] = maidenPathname.split('.').reverse();
     return `.${fileExtension}`;
 }
 
+/**
+* @param {Request} request
+* @returns {Promise<Response>}
+*/
 async function requestHandler(request) {
-    const mode = request.headers.get('sec-fetch-mode');
-    const dest = request.headers.get('sec-fetch-dest');
-    const site = request.headers.get('sec-fetch-site');
-
     const { pathname } = new URL(request.url);
-    const assetPath = assetMap[pathname];
-    const maidenPathname = removeSlashes(assetPath);
 
     const { sessionStorage, localStorage } = globalThis;
-    
+
     const storage = sessionStorage || localStorage;
 
     if (storage) {
@@ -70,27 +80,111 @@ async function requestHandler(request) {
         }
     }
 
-    const textFileContent = await Deno.readTextFile(assetPath);
-    // Absolute paths.
-    // The content of the repository is available under at Deno.cwd().
-    // const readmeAbsolute = await Deno.readFile(`${Deno.cwd()}/README.md`);
-    // File URLs are also supported.
-    //   const readmeFileUrl = await Deno.readFile(
-    //     new URL(`file://${Deno.cwd()}/README.md`),
-    //   );
+    const assetPath = assetMap[pathname];
 
-    // Decode the Uint8Array as string.
-    // const readme = new TextDecoder().decode(readmeRelative);
-    // return new Response(textFileContent);
-    return new Response(textFileContent, {
-        headers: {
-            "content-type": MEDIA_TYPES[getFileExtensionFromPath(maidenPathname)],
+    if (assetPath) {
+        try {
+
+            const mode = request.headers.get('sec-fetch-mode');
+            const dest = request.headers.get('sec-fetch-dest');
+            const contentTypeHTML = mode === 'navigate' || dest === 'document';
+
+            if (contentTypeHTML) {
+                const content = await Deno.readTextFile(assetPath);
+                const { main } = await import('./js/importmap-generator.js');
+                const importMap = await main();
+
+                const [beforeImportmap, afterImportmap] = content.split("//__importmap");
+                const html = `${beforeImportmap}${importMap}${afterImportmap}`;
+
+                return new Response(html, {
+                    headers: {
+                        "content-type": MEDIA_TYPES['.html'],
+                    }
+                });
+            }
+
+            const content = Deno.readFile(assetPath);
+            const textDecodedContent = new TextDecoder().decode(fileContent);
+            const maidenPathname = removeSlashes(assetPath);
+
+            return new Response(textDecodedContent, {
+                headers: {
+                    "content-type": MEDIA_TYPES[getFileExtensionFromPath(maidenPathname)],
+                }
+            });
+        } catch (error) {
+            return new Response(error.message || error.toString(), { status: 500 });
         }
+    }
+
+
+    const site = request.headers.get('sec-fetch-site');
+    const contentTypeCompiledJSX = dest === 'script' && mode === 'cors' && site === 'same-origin' && pathname.endsWith(".jsx.js");
+
+    if (contentTypeCompiledJSX) {
+        try {
+            const { files, diagnostics } = await Deno.emit(`.${pathname}`.slice(0, -3));
+
+            if (diagnostics.length) {
+                // there is something that impacted the emit
+                console.warn(Deno.formatDiagnostics(diagnostics));
+            }
+            // @ts-ignore
+            const [, content] = Object.entries(files).find(([fileName]) => {
+                const cwd = toFileUrl(Deno.cwd()).href;
+                const commonPath = common([
+                    cwd,
+                    fileName,
+                ]);
+                const shortFileName = fileName.replace(commonPath, `/`);
+
+                return shortFileName === pathname;
+            });
+            return new Response(content);
+        } catch (error) {
+            return new Response(error.message || error.toString(), { status: 500 })
+        }
+    }
+
+    if (pathname.endsWith(".jsx")) {
+        try {
+            if (storage) {
+                const { files, diagnostics } = await Deno.emit(`.${pathname}`);
+
+                if (diagnostics.length) {
+                    // there is something that impacted the emit
+                    console.warn(Deno.formatDiagnostics(diagnostics));
+                }
+
+                for (const [fileName, text] of Object.entries(files)) {
+
+                    const cwd = toFileUrl(Deno.cwd()).href;
+                    const commonPath = common([
+                        cwd,
+                        fileName,
+                    ]);
+                    const maidenPathname = fileName.replace(commonPath, ``);
+
+                    storage.setItem(maidenPathname, text);
+                }
+            }
+
+            return new Response(pathname, {
+                status: 303,
+                headers: {
+                    "location": `${request.url}.js`,
+                },
+            });
+        } catch (error) {
+            return new Response(error.message || error.toString(), { status: 500 })
+        }
+    }
+
+    return new Response(null, {
+      status: 404,
     });
 }
-
-// console.log("Listening on http://localhost:8080");
-// await listenAndServe(":8080", handler);
 
 if (import.meta.main) {
     const PORT = Deno.env.get("PORT") || 1729;
@@ -99,5 +193,4 @@ if (import.meta.main) {
     console.log('Current Date: ', humanReadableDateTime)
     console.info(`Server Listening on http://localhost:${PORT}`);
     listenAndServe(`:${PORT}`, requestHandler);
-  }
-  
+}
