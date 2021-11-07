@@ -1,4 +1,5 @@
 import { listenAndServe } from "https://deno.land/std@0.111.0/http/server.ts";
+import { MEDIA_TYPES } from './media-type.js';
 
 const assetMap = {
     '/': './deploy.html',
@@ -62,7 +63,12 @@ async function handler(request) {
 
     // Decode the Uint8Array as string.
     // const readme = new TextDecoder().decode(readmeRelative);
-    return new Response(textFileContent);
+    // return new Response(textFileContent);
+    return new Response(html, {
+        headers: {
+            "content-type": MEDIA_TYPES[`.${fileExtension}`],
+        }
+    });
 }
 
 console.log("Listening on http://localhost:8080");
