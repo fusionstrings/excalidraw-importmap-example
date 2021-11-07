@@ -64,7 +64,7 @@ async function handler(request) {
     // Decode the Uint8Array as string.
     // const readme = new TextDecoder().decode(readmeRelative);
     // return new Response(textFileContent);
-    return new Response(html, {
+    return new Response(textFileContent, {
         headers: {
             "content-type": MEDIA_TYPES[`.${fileExtension}`],
         }
