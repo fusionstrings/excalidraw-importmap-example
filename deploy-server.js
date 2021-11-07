@@ -1,41 +1,23 @@
-import { listenAndServe } from "https://deno.land/std@0.113.0/http/server.ts";
+import { listenAndServe } from "https://deno.land/std@0.111.0/http/server.ts";
 
-const staticAssets = {
-    "/": "./deploy.html",
-    "/deploy.html": "./deploy.html"
-};
+async function handler(_req) {
+  // Let's read the README.md file available at the root
+  // of the repository to explore the available methods.
 
-/**
-* @param {Request} request
-* @returns {Promise<Response>}
-*/
-async function requestHandler(request) {
-    const mode = request.headers.get('sec-fetch-mode');
-    const dest = request.headers.get('sec-fetch-dest');
-    const site = request.headers.get('sec-fetch-site');
+  // Relative paths are relative to the root of the repository
+  const readmeRelative = await Deno.readFile("./README.md");
+  // Absolute paths.
+  // The content of the repository is available under at Deno.cwd().
+  // const readmeAbsolute = await Deno.readFile(`${Deno.cwd()}/README.md`);
+  // File URLs are also supported.
+//   const readmeFileUrl = await Deno.readFile(
+//     new URL(`file://${Deno.cwd()}/README.md`),
+//   );
 
-    const { pathname } = new URL(request.url);
-    const staticFileRelativePath = staticAssets[pathname];
-
-    console.log('mode: ', mode);
-    console.log('pathname: ', pathname);
-    console.log('staticFileRelativePath: ', staticFileRelativePath);
-
-    if (staticFile) {
-        try {
-            const staticFile = await Deno.readTextFile(staticFileRelativePath);
-            return new Response(staticFile);
-        } catch (error) {
-            return new Response(error.message || error.toString(), { status: 500 })
-        }
-    }
+  // Decode the Uint8Array as string.
+  const readme = new TextDecoder().decode(readmeRelative);
+  return new Response(readme);
 }
 
-if (import.meta.main) {
-    const PORT = Deno.env.get("PORT") || 8080;
-    const timestamp = Date.now();
-    const humanReadableDateTime = new Date(timestamp).toLocaleString();
-    console.log('Current Date: ', humanReadableDateTime)
-    console.info(`Server Listening on http://localhost:${PORT}`);
-    listenAndServe(`:${PORT}`, requestHandler);
-}
+console.log("Listening on http://localhost:8080");
+await listenAndServe(":8080", handler);
