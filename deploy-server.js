@@ -1,6 +1,10 @@
 import { listenAndServe } from "https://deno.land/std@0.111.0/http/server.ts";
 import { MEDIA_TYPES } from './media-type.js';
 
+const { sessionStorage, localStorage } = globalThis;
+console.log('sessionStorage: ', sessionStorage);
+console.log('localStorage: ', localStorage);
+
 const assetMap = {
     '/': './deploy.html',
     '/README.md': './README.md'
@@ -36,6 +40,11 @@ function removeSlashes(path) {
     return removeTrailingSlash(removeLeadingSlash(path));
 }
 
+function getFileExtensionFromPath(maidenPathname) {
+    const [fileExtension] = maidenPathname.split('.').reverse();
+    return `.${fileExtension}`;
+}
+
 async function handler(request) {
     const mode = request.headers.get('sec-fetch-mode');
     const dest = request.headers.get('sec-fetch-dest');
@@ -44,13 +53,24 @@ async function handler(request) {
     const { pathname } = new URL(request.url);
     const assetPath = assetMap[pathname];
     const maidenPathname = removeSlashes(assetPath);
-    const [fileExtension] = maidenPathname.split('.').reverse();
 
-    console.log('mode: ', mode);
-    console.log('pathname: ', pathname);
-    console.log('assetPath: ', assetPath);
-    console.log('maidenPathname: ', maidenPathname);
-    console.log('fileExtension: ', fileExtension);
+    const storage = sessionStorage || localStorage;
+
+    if (storage) {
+        const storedFileKey = removeSlashes(pathname);
+        const storedFile = storage.getItem(storedFileKey);
+
+        if (storedFile) {
+            return new Response(storedFile, {
+                // @ts-ignore
+                headers: {
+                    // @ts-ignore
+                    "content-type": MEDIA_TYPES[getFileExtensionFromPath(storedFileKey)],
+                    "x-cache": 'HIT'
+                }
+            });
+        }
+    }
 
     const textFileContent = await Deno.readTextFile(assetPath);
     // Absolute paths.
@@ -66,7 +86,7 @@ async function handler(request) {
     // return new Response(textFileContent);
     return new Response(textFileContent, {
         headers: {
-            "content-type": MEDIA_TYPES[`.${fileExtension}`],
+            "content-type": MEDIA_TYPES[getFileExtensionFromPath(maidenPathname)],
         }
     });
 }
