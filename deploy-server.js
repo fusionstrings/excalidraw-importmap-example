@@ -1,5 +1,4 @@
 import { listenAndServe } from "https://deno.land/std@0.113.0/http/server.ts";
-import { serveFile } from "https://deno.land/std@0.113.0/http/file_server.ts";
 
 const staticAssets = {
     "/": "./deploy.html",
@@ -23,7 +22,7 @@ async function requestHandler(request) {
 
     if (staticFile) {
         try {
-            return serveFile(request, staticFile);
+            await Deno.readFile(staticFile);
         } catch (error) {
             return new Response(error.message || error.toString(), { status: 500 })
         }
