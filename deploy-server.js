@@ -13,16 +13,18 @@ async function requestHandler(request) {
     const mode = request.headers.get('sec-fetch-mode');
     const dest = request.headers.get('sec-fetch-dest');
     const site = request.headers.get('sec-fetch-site');
+
     const { pathname } = new URL(request.url);
-    const staticFile = staticAssets[pathname];
+    const staticFileRelativePath = staticAssets[pathname];
 
     console.log('mode: ', mode);
     console.log('pathname: ', pathname);
-    console.log('staticFile: ', staticFile);
+    console.log('staticFileRelativePath: ', staticFileRelativePath);
 
     if (staticFile) {
         try {
-            await Deno.readFile(staticFile);
+            const staticFile = await Deno.readTextFile(staticFileRelativePath);
+            return new Response(staticFile);
         } catch (error) {
             return new Response(error.message || error.toString(), { status: 500 })
         }
