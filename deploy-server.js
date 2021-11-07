@@ -14,9 +14,12 @@ async function requestHandler(request) {
     const mode = request.headers.get('sec-fetch-mode');
     const dest = request.headers.get('sec-fetch-dest');
     const site = request.headers.get('sec-fetch-site');
-
     const { pathname } = new URL(request.url);
     const staticFile = staticAssets[pathname];
+
+    console.log('mode: ', mode);
+    console.log('pathname: ', pathname);
+    console.log('staticFile: ', staticFile);
 
     if (staticFile) {
         try {
