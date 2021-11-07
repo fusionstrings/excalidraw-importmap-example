@@ -9,31 +9,31 @@ const assetMap = {
  * @param {string} path 
  * @returns {string}
  */
- function removeLeadingSlash(path) {
+function removeLeadingSlash(path) {
     if (path.startsWith("/")) {
-      return path.slice(1);
+        return path.slice(1);
     }
     return path;
-  }
-  
-  /**
-   * @param {string} path 
-   * @returns {string}
-   */
-  function removeTrailingSlash(path) {
+}
+
+/**
+ * @param {string} path 
+ * @returns {string}
+ */
+function removeTrailingSlash(path) {
     if (path.endsWith("/")) {
-      return path.slice(0, -1);
+        return path.slice(0, -1);
     }
     return path;
-  }
-  
-  /**
-   * @param {string} path 
-   * @returns {string}
-   */
-  function removeSlashes(path) {
+}
+
+/**
+ * @param {string} path 
+ * @returns {string}
+ */
+function removeSlashes(path) {
     return removeTrailingSlash(removeLeadingSlash(path));
-  }
+}
 
 async function handler(request) {
     const mode = request.headers.get('sec-fetch-mode');
@@ -43,7 +43,7 @@ async function handler(request) {
     const { pathname } = new URL(request.url);
     const assetPath = assetMap[pathname];
     const maidenPathname = removeSlashes(assetPath);
-    const [...rest, fileExtension] = maidenPathname.split('.')
+    const [fileExtension] = maidenPathname.split('.').reverse();
 
     console.log('mode: ', mode);
     console.log('pathname: ', pathname);
@@ -51,7 +51,7 @@ async function handler(request) {
     console.log('maidenPathname: ', maidenPathname);
     console.log('fileExtension: ', fileExtension);
 
-    const asset = await Deno.readTextFile(assetPath);
+    const textFileContent = await Deno.readTextFile(assetPath);
     // Absolute paths.
     // The content of the repository is available under at Deno.cwd().
     // const readmeAbsolute = await Deno.readFile(`${Deno.cwd()}/README.md`);
@@ -62,7 +62,11 @@ async function handler(request) {
 
     // Decode the Uint8Array as string.
     // const readme = new TextDecoder().decode(readmeRelative);
-    return new Response(asset);
+    return new Response(textFileContent, {
+        headers: {
+            "content-type": MEDIA_TYPES[`.${fileExtension}`],
+        }
+    });
 }
 
 console.log("Listening on http://localhost:8080");
