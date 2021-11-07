@@ -1,10 +1,6 @@
 import { listenAndServe } from "https://deno.land/std@0.111.0/http/server.ts";
 import { MEDIA_TYPES } from './media-type.js';
 
-const { sessionStorage, localStorage } = globalThis;
-console.log('sessionStorage: ', sessionStorage);
-console.log('localStorage: ', localStorage);
-
 const assetMap = {
     '/': './deploy.html',
     '/README.md': './README.md'
@@ -45,7 +41,7 @@ function getFileExtensionFromPath(maidenPathname) {
     return `.${fileExtension}`;
 }
 
-async function handler(request) {
+async function requestHandler(request) {
     const mode = request.headers.get('sec-fetch-mode');
     const dest = request.headers.get('sec-fetch-dest');
     const site = request.headers.get('sec-fetch-site');
@@ -54,6 +50,8 @@ async function handler(request) {
     const assetPath = assetMap[pathname];
     const maidenPathname = removeSlashes(assetPath);
 
+    const { sessionStorage, localStorage } = globalThis;
+    
     const storage = sessionStorage || localStorage;
 
     if (storage) {
@@ -91,5 +89,15 @@ async function handler(request) {
     });
 }
 
-console.log("Listening on http://localhost:8080");
-await listenAndServe(":8080", handler);
+// console.log("Listening on http://localhost:8080");
+// await listenAndServe(":8080", handler);
+
+if (import.meta.main) {
+    const PORT = Deno.env.get("PORT") || 1729;
+    const timestamp = Date.now();
+    const humanReadableDateTime = new Date(timestamp).toLocaleString();
+    console.log('Current Date: ', humanReadableDateTime)
+    console.info(`Server Listening on http://localhost:${PORT}`);
+    listenAndServe(`:${PORT}`, requestHandler);
+  }
+  
