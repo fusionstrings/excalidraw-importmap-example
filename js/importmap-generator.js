@@ -1,4 +1,4 @@
-import { Generator } from "https://github.com/fusionstrings/dependencies/blob/c59ae9dde8d5d339b3c0433d4b4f46e72739fafe/dist/browser/jspm.js";
+import { Generator } from 'https://cdn.jsdelivr.net/gh/fusionstrings/dependencies@c59ae9dde8d5d339b3c0433d4b4f46e72739fafe/dist/browser/jspm.js';
 
 async function main(subpath = "./js/main.js") {
     const generator = new Generator();
