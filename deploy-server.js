@@ -1,5 +1,6 @@
 import { listenAndServe } from "https://deno.land/std@0.111.0/http/server.ts";
 import { MEDIA_TYPES } from './media-type.js';
+import { main as generateImportmap } from './js/importmap-generator.js';
 
 const assetMap = {
     '/': './deploy.html',
@@ -91,8 +92,7 @@ async function requestHandler(request) {
 
             if (contentTypeHTML) {
                 const content = await Deno.readTextFile(assetPath);
-                const { main } = await import('./js/importmap-generator.js');
-                const importMap = await main();
+                const importMap = await generateImportmap();
 
                 const [beforeImportmap, afterImportmap] = content.split("//__importmap");
                 const html = `${beforeImportmap}${importMap}${afterImportmap}`;
@@ -182,7 +182,7 @@ async function requestHandler(request) {
     }
 
     return new Response(null, {
-      status: 404,
+        status: 404,
     });
 }
 
