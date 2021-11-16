@@ -18,7 +18,7 @@ const staticAssets = {
 
 /**
  * @param {string} path 
- * @returns string
+ * @returns {string}
  */
 function removeLeadingSlash(path) {
   if (path.startsWith("/")) {
@@ -29,7 +29,7 @@ function removeLeadingSlash(path) {
 
 /**
  * @param {string} path 
- * @returns 
+ * @returns {string}
  */
 function removeTrailingSlash(path) {
   if (path.endsWith("/")) {
@@ -40,7 +40,7 @@ function removeTrailingSlash(path) {
 
 /**
  * @param {string} path 
- * @returns 
+ * @returns {string}
  */
 function removeSlashes(path) {
   return removeTrailingSlash(removeLeadingSlash(path));
@@ -48,6 +48,7 @@ function removeSlashes(path) {
 
 /**
 * @param {Request} request
+* @returns {Promise<Response>}
 */
 async function requestHandler(request) {
   const mode = request.headers.get('sec-fetch-mode');
