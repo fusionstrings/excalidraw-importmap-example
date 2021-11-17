@@ -10,10 +10,10 @@ import { ensureDir } from "https://deno.land/std@0.113.0/fs/mod.ts";
 import { MEDIA_TYPES } from "./media-type.js";
 
 const staticAssets = {
-  "/": "./dev.html",
-  "/dev.html": "./dev.html",
+  "/": "./index.html",
+  "/index.html": "./index.html",
   "/css/style.css": "./css/style.css",
-  "/js/dev.js": "./js/dev.js"
+  "/js/main.js": "./js/main.js"
 };
 
 /**
@@ -125,31 +125,6 @@ async function requestHandler(request) {
 
   if (extname(pathname) === ".jsx") {
     try {
-
-      const { files, diagnostics } = await Deno.emit(`.${pathname}`);
-
-      if (diagnostics.length) {
-        // there is something that impacted the emit
-        console.warn(Deno.formatDiagnostics(diagnostics));
-      }
-
-      for (const [fileName, text] of Object.entries(files)) {
-
-        const cwd = toFileUrl(Deno.cwd()).href;
-        const commonPath = common([
-          cwd,
-          fileName,
-        ]);
-        const shortFileName = fileName.replace(commonPath, ``);
-
-        sessionStorage.setItem(shortFileName, text);
-        const outputFileName = `./dist/${shortFileName}`;
-
-        const { dir } = parse(outputFileName);
-        await ensureDir(dir);
-        await Deno.writeTextFile(outputFileName, text);
-      }
-
       return new Response(pathname, {
         status: 303,
         headers: {
