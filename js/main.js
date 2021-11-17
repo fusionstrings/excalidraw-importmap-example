@@ -1,1 +1,1 @@
-export { main } from './dom.jsx.js';
+export { main } from './dom.jsx';
