@@ -131,7 +131,7 @@ async function requestHandler(request) {
       return new Response(pathname, {
         status: 303,
         headers: {
-          "location": `${request.url}.js`,
+          "location": `${request.url.replace('http://', 'https://')}.js`,
         },
       });
     } catch (error) {
