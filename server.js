@@ -1,12 +1,12 @@
-import { listenAndServe } from "https://deno.land/std@0.113.0/http/server.ts";
-import { serveFile } from "https://deno.land/std@0.113.0/http/file_server.ts";
+import { listenAndServe } from "https://deno.land/std@0.115.0/http/server.ts";
+import { serveFile } from "https://deno.land/std@0.115.0/http/file_server.ts";
 import {
   common,
   parse,
   extname,
   toFileUrl,
-} from "https://deno.land/std@0.113.0/path/mod.ts";
-import { ensureDir } from "https://deno.land/std@0.113.0/fs/mod.ts";
+} from "https://deno.land/std@0.115.0/path/mod.ts";
+import { ensureDir } from "https://deno.land/std@0.115.0/fs/mod.ts";
 import { MEDIA_TYPES } from "./media-type.js";
 
 const staticAssets = {
