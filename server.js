@@ -2,18 +2,17 @@ import { listenAndServe } from "https://deno.land/std@0.115.0/http/server.ts";
 import { serveFile } from "https://deno.land/std@0.115.0/http/file_server.ts";
 import {
   common,
-  parse,
   extname,
   toFileUrl,
 } from "https://deno.land/std@0.115.0/path/mod.ts";
-import { ensureDir } from "https://deno.land/std@0.115.0/fs/mod.ts";
 import { MEDIA_TYPES } from "./media-type.js";
 
 const staticAssets = {
   "/": "./index.html",
   "/index.html": "./index.html",
   "/css/style.css": "./css/style.css",
-  "/js/main.js": "./js/main.js"
+  "/js/main.js": "./js/main.js",
+  "/data/initial-data.js": "./data/initial-data.js"
 };
 
 /**
@@ -67,7 +66,7 @@ async function requestHandler(request) {
         headers: {
           // @ts-ignore
           "content-type": MEDIA_TYPES[extname(storedFileKey)],
-          "x-cache-hit": true
+          "x-cache": 'HIT'
         }
       });
     }
@@ -80,7 +79,7 @@ async function requestHandler(request) {
     try {
       if (mode === 'navigate' || dest === 'document') {
         const content = await Deno.readTextFile(staticFile);
-        const { main } = await import('./js/importmap-generator.js');
+        const { main } = await import('./importmap-generator.js');
         const importMap = await main();
 
         const [beforeImportmap, afterImportmap] = content.split("//__importmap");
@@ -117,7 +116,11 @@ async function requestHandler(request) {
 
         return shortFileName === pathname;
       });
-      return new Response(content);
+      return new Response(content, {
+        headers: {
+          "content-type": MEDIA_TYPES['.js'],
+        }
+      });
     } catch (error) {
       return new Response(error.message || error.toString(), { status: 500 })
     }
