@@ -1,41 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Excalidraw in browser</title>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="css/style.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@fusionstrings/river</title>
+    <link rel="stylesheet" href="css/style.css" />
     <script
       async
-      src="https://ga.jspm.io/npm:es-module-shims@0.10.1/dist/es-module-shims.min.js"
+      src="https://ga.jspm.io/npm:es-module-shims@1.3.0/dist/es-module-shims.js"
     ></script>
     <script type="importmap" id="importmap">
-      {
-        "imports": {
-          "@fusionstrings/begining/js/main.js": "./js/main.js"
-        },
-        "scopes": {
-          "./": {
-            "@excalidraw/excalidraw": "https://ga.jspm.io/npm:@excalidraw/excalidraw@0.10.0/dev.main.js",
-            "react": "https://ga.jspm.io/npm:react@17.0.2/dev.index.js",
-            "react-dom": "https://ga.jspm.io/npm:react-dom@17.0.2/dev.index.js"
-          },
-          "https://ga.jspm.io/": {
-            "object-assign": "https://ga.jspm.io/npm:object-assign@4.1.1/index.js",
-            "react": "https://ga.jspm.io/npm:react@17.0.2/dev.index.js",
-            "react-dom": "https://ga.jspm.io/npm:react-dom@17.0.2/dev.index.js",
-            "scheduler": "https://ga.jspm.io/npm:scheduler@0.20.2/dev.index.js",
-            "scheduler/tracing": "https://ga.jspm.io/npm:scheduler@0.20.2/dev.tracing.js"
-          }
-        }
-      }
+      //__importmap
     </script>
   </head>
-
   <body>
-    <div class="container">
-      <h1>Excalidraw Importmap Example</h1>
-      <div id="app"></div>
-    </div>
-    <script type="module" src="js/main.js"></script>
+    <main id="root"><h1>@fusionstrings/river</h1></main>
+
+    <script type="module">
+      import { main } from "./js/main.js";
+      main({ mountElementID: "root" });
+    </script>
   </body>
 </html>
