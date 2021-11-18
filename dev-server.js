@@ -2,11 +2,11 @@ import { listenAndServe } from "https://deno.land/std@0.113.0/http/server.ts";
 import { serveFile } from "https://deno.land/std@0.113.0/http/file_server.ts";
 import {
   common,
-  parse,
+  // parse,
   extname,
   toFileUrl,
 } from "https://deno.land/std@0.113.0/path/mod.ts";
-import { ensureDir } from "https://deno.land/std@0.113.0/fs/mod.ts";
+//import { ensureDir } from "https://deno.land/std@0.113.0/fs/mod.ts";
 import { MEDIA_TYPES } from "./media-type.js";
 
 const staticAssets = {
@@ -143,11 +143,11 @@ async function requestHandler(request) {
         const shortFileName = fileName.replace(commonPath, ``);
 
         sessionStorage.setItem(shortFileName, text);
-        const outputFileName = `./dist/${shortFileName}`;
+        // const outputFileName = `./dist/${shortFileName}`;
 
-        const { dir } = parse(outputFileName);
-        await ensureDir(dir);
-        await Deno.writeTextFile(outputFileName, text);
+        // const { dir } = parse(outputFileName);
+        // await ensureDir(dir);
+        // await Deno.writeTextFile(outputFileName, text);
       }
 
       return new Response(pathname, {
