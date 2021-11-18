@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - cloud-run
+      - master
 
 name: GCR Build and Deploy a Container
 env:
