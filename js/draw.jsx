@@ -6,7 +6,7 @@ import InitialData from "../data/initial-data.js";
 function Draw() {
 	const excalidrawRef = useRef(null);
 
-	const [viewModeEnabled, setViewModeEnabled] = useState(true);
+	const [viewModeEnabled, setViewModeEnabled] = useState(false);
 	const [zenModeEnabled, setZenModeEnabled] = useState(true);
 	const [gridModeEnabled, setGridModeEnabled] = useState(false);
 
