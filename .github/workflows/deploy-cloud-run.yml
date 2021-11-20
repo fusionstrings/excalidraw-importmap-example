@@ -6,8 +6,9 @@ on:
 name: GCR Build and Deploy a Container
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  SERVICE: excalidraw-importmap-example
-  REGION: europe-north1
+  SERVICE: ${{ secrets.GCR_SERVICE }}
+  REGION: ${{ secrets.GCR_REGION }}
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY}}
 
 jobs:
   deploy:
@@ -28,8 +29,8 @@ jobs:
 
     - name: Build and Push Container
       run: |-
-        docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} .
-        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+        docker build -t ${{env.DOCKER_REGISTRY}}/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} .
+        docker push ${{env.DOCKER_REGISTRY}}/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
         
     - name: Deploy to Cloud Run
       id: deploy
@@ -38,6 +39,3 @@ jobs:
         service: ${{ env.SERVICE }}
         image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
         region: ${{ env.REGION }}
-
-    - name: Show Output
-      run: echo ${{ steps.deploy.outputs.url }}
