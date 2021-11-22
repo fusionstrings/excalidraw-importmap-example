@@ -1,9 +1,6 @@
 import * as React from "react";
 import { useRef, useState } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
-// import InitialData from "../data/initial-data.js";
-// import InitialData from './data/jspm.org-ia.excalidraw' assert { type: "json" };
-
 
 function Draw({initialData}) {
 	const excalidrawRef = useRef(null);
