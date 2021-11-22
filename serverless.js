@@ -1,10 +1,10 @@
-import { listenAndServe } from "https://deno.land/std@0.115.0/http/server.ts";
-import { serveFile } from "https://deno.land/std@0.115.0/http/file_server.ts";
+import { listenAndServe } from "https://deno.land/std@0.115.1/http/server.ts";
+import { serveFile } from "https://deno.land/std@0.115.1/http/file_server.ts";
 import {
   common,
   extname,
   toFileUrl,
-} from "https://deno.land/std@0.115.0/path/mod.ts";
+} from "https://deno.land/std@0.115.1/path/mod.ts";
 import { MEDIA_TYPES } from "./media-type.js";
 
 import { main as generateImportmap } from './importmap-generator.js';
