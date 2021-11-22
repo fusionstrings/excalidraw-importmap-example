@@ -26,7 +26,7 @@
     import excalidraw from "@excalidraw/excalidraw";
 
     let params = (new URL(document.location)).searchParams;
-    let scratch = params.get('scratch') ? new URL(params.get('scratch')/* .replace('http://', 'https://') */).toString() : '';
+    let scratch = params.get('scratch') ? new URL(params.get('scratch').replace('http://', 'https://')).toString() : '';
     const format = params.get('format');
     let initialData = null;
 
